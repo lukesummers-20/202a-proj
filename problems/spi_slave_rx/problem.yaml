@@ -1,0 +1,23 @@
+id: spi_slave_rx
+class: fsm            # combinational | fsm | datapath
+source: own           # own | verilogeval
+title: SPI mode-0 slave byte receiver
+module: spi_slave_rx
+top_for_sim: spi_slave_rx
+formats: [prose, table, wave, combined]
+ports:
+  - {name: clk,   dir: input,  width: 1}
+  - {name: rst_n, dir: input,  width: 1}
+  - {name: sclk,  dir: input,  width: 1}
+  - {name: mosi,  dir: input,  width: 1}
+  - {name: cs_n,  dir: input,  width: 1}
+  - {name: data,  dir: output, width: 8}
+  - {name: valid, dir: output, width: 1}
+requirements:   # hidden from the model; used to write the TB and to check each format is sufficient
+  - "Synchronous design clocked by clk; rst_n is active-low synchronous reset."
+  - "sclk, mosi, cs_n are asynchronous to clk; clk runs at least 8x faster than sclk."
+  - "Mode 0: sample mosi on the rising edge of sclk; MSB first."
+  - "After the 8th sampled bit, data holds the byte and valid pulses high for exactly one clk cycle."
+  - "While cs_n is high the receiver is idle; the bit counter restarts at 0 when cs_n next goes low."
+  - "Latency from the 8th sclk rising edge to valid may be up to 6 clk cycles."
+  - "data must hold its value until the next byte completes."

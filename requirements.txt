@@ -1,0 +1,5 @@
+cocotb>=2.0
+pyslang
+pyyaml
+openai
+anthropic

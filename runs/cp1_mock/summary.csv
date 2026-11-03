@@ -1,0 +1,9 @@
+format,dialect,pass_at_1,ci_lo,ci_hi,n_problems
+combined,sv,0.6,0.6,0.6,1
+combined,v2001,0.6,0.6,0.6,1
+prose,sv,0.6,0.6,0.6,1
+prose,v2001,0.6,0.6,0.6,1
+table,sv,0.6,0.6,0.6,1
+table,v2001,0.6,0.6,0.6,1
+wave,sv,0.6,0.6,0.6,1
+wave,v2001,0.6,0.6,0.6,1

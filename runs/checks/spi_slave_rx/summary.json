@@ -1,0 +1,57 @@
+{
+  "problem": "spi_slave_rx",
+  "sims": [
+    "icarus",
+    "verilator"
+  ],
+  "refs": {
+    "ref.sv/icarus": "pass",
+    "ref.sv/verilator": "pass",
+    "ref.v/icarus": "pass",
+    "ref.v/verilator": "pass"
+  },
+  "mutants": {
+    "m1_falling_edge/icarus": {
+      "status": "fail",
+      "first_assert": "T2: valid never asserted for byte 0xA5"
+    },
+    "m1_falling_edge/verilator": {
+      "status": "fail",
+      "first_assert": "T2: valid never asserted for byte 0xA5"
+    },
+    "m2_bit_order/icarus": {
+      "status": "fail",
+      "first_assert": "T2: data=0xD2 expected 0xA5"
+    },
+    "m2_bit_order/verilator": {
+      "status": "fail",
+      "first_assert": "T2: data=0xD2 expected 0xA5"
+    },
+    "m3_sticky_valid/icarus": {
+      "status": "fail",
+      "first_assert": "T2: valid wider than one clk cycle"
+    },
+    "m3_sticky_valid/verilator": {
+      "status": "fail",
+      "first_assert": "T2: valid wider than one clk cycle"
+    },
+    "m4_ignore_cs/icarus": {
+      "status": "fail",
+      "first_assert": "T4: valid never asserted for byte 0x0F"
+    },
+    "m4_ignore_cs/verilator": {
+      "status": "fail",
+      "first_assert": "T4: valid never asserted for byte 0x0F"
+    },
+    "m5_off_by_one/icarus": {
+      "status": "fail",
+      "first_assert": "T2: valid never asserted for byte 0xA5"
+    },
+    "m5_off_by_one/verilator": {
+      "status": "fail",
+      "first_assert": "T2: valid never asserted for byte 0xA5"
+    }
+  },
+  "kill_rate": "10/10",
+  "distinct_first_asserts": 4
+}

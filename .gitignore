@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# simulator build/work dirs are regenerable; keep generations.jsonl, results.jsonl, designs/*.sv, summary.csv
+runs/**/sim_*/
+runs/**/sim_build/
+runs/checks/*/*/
+runs/checks/*.sv
+results.xml
+*.vcd
+*.fst
