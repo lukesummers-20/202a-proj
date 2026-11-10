@@ -1,0 +1,203 @@
+{
+ "sims": [
+  "icarus",
+  "verilator"
+ ],
+ "rows": [
+  {
+   "problem": "prio_enc8",
+   "class": "combinational",
+   "refs_pass": "4/4",
+   "mutants_killed": "4/4",
+   "distinct_first_asserts": 4,
+   "sim_agreement": "6/6",
+   "status": "OK"
+  },
+  {
+   "problem": "spi_slave_rx",
+   "class": "fsm",
+   "refs_pass": "4/4",
+   "mutants_killed": "5/5",
+   "distinct_first_asserts": 4,
+   "sim_agreement": "7/7",
+   "status": "OK"
+  },
+  {
+   "problem": "sync_fifo",
+   "class": "datapath",
+   "refs_pass": "4/4",
+   "mutants_killed": "8/8",
+   "distinct_first_asserts": 10,
+   "sim_agreement": "10/10",
+   "status": "OK"
+  }
+ ],
+ "detail": {
+  "prio_enc8": {
+   "refs": {
+    "ref.sv/icarus": "pass",
+    "ref.sv/verilator": "pass",
+    "ref.v/icarus": "pass",
+    "ref.v/verilator": "pass"
+   },
+   "mutants": {
+    "m1_lowest_priority/icarus": {
+     "status": "fail",
+     "first_assert": "req=0x03: idx=0 expected 1"
+    },
+    "m1_lowest_priority/verilator": {
+     "status": "fail",
+     "first_assert": "req=0x03: idx=0 expected 1"
+    },
+    "m2_idle_idx/icarus": {
+     "status": "fail",
+     "first_assert": "req=0x00: idx=7 expected 0"
+    },
+    "m2_idle_idx/verilator": {
+     "status": "fail",
+     "first_assert": "req=0x00: idx=7 expected 0"
+    },
+    "m3_valid_and/icarus": {
+     "status": "fail",
+     "first_assert": "req=0x01: valid=0 expected 1"
+    },
+    "m3_valid_and/verilator": {
+     "status": "fail",
+     "first_assert": "req=0x01: valid=0 expected 1"
+    },
+    "m4_off_by_one/icarus": {
+     "status": "fail",
+     "first_assert": "req=0x01: idx=1 expected 0"
+    },
+    "m4_off_by_one/verilator": {
+     "status": "fail",
+     "first_assert": "req=0x01: idx=1 expected 0"
+    }
+   }
+  },
+  "spi_slave_rx": {
+   "refs": {
+    "ref.sv/icarus": "pass",
+    "ref.sv/verilator": "pass",
+    "ref.v/icarus": "pass",
+    "ref.v/verilator": "pass"
+   },
+   "mutants": {
+    "m1_falling_edge/icarus": {
+     "status": "fail",
+     "first_assert": "T2: valid never asserted for byte 0xA5"
+    },
+    "m1_falling_edge/verilator": {
+     "status": "fail",
+     "first_assert": "T2: valid never asserted for byte 0xA5"
+    },
+    "m2_bit_order/icarus": {
+     "status": "fail",
+     "first_assert": "T2: data=0xD2 expected 0xA5"
+    },
+    "m2_bit_order/verilator": {
+     "status": "fail",
+     "first_assert": "T2: data=0xD2 expected 0xA5"
+    },
+    "m3_sticky_valid/icarus": {
+     "status": "fail",
+     "first_assert": "T2: valid wider than one clk cycle"
+    },
+    "m3_sticky_valid/verilator": {
+     "status": "fail",
+     "first_assert": "T2: valid wider than one clk cycle"
+    },
+    "m4_ignore_cs/icarus": {
+     "status": "fail",
+     "first_assert": "T4: valid never asserted for byte 0x0F"
+    },
+    "m4_ignore_cs/verilator": {
+     "status": "fail",
+     "first_assert": "T4: valid never asserted for byte 0x0F"
+    },
+    "m5_off_by_one/icarus": {
+     "status": "fail",
+     "first_assert": "T2: valid never asserted for byte 0xA5"
+    },
+    "m5_off_by_one/verilator": {
+     "status": "fail",
+     "first_assert": "T2: valid never asserted for byte 0xA5"
+    }
+   }
+  },
+  "sync_fifo": {
+   "refs": {
+    "ref.sv/icarus": "pass",
+    "ref.sv/verilator": "pass",
+    "ref.v/icarus": "pass",
+    "ref.v/verilator": "pass"
+   },
+   "mutants": {
+    "m1_full_off_by_one/icarus": {
+     "status": "fail",
+     "first_assert": "T2 fill: full=1 with 3 items stored"
+    },
+    "m1_full_off_by_one/verilator": {
+     "status": "fail",
+     "first_assert": "T2 fill: full=1 with 3 items stored"
+    },
+    "m2_empty_off_by_one/icarus": {
+     "status": "fail",
+     "first_assert": "T3 drain: empty=1 with 1 items stored"
+    },
+    "m2_empty_off_by_one/verilator": {
+     "status": "fail",
+     "first_assert": "T3 drain: empty=1 with 1 items stored"
+    },
+    "m3_write_when_full/icarus": {
+     "status": "fail",
+     "first_assert": "T2 fill: full=0 with 4 items stored"
+    },
+    "m3_write_when_full/verilator": {
+     "status": "fail",
+     "first_assert": "T2 fill: full=0 with 4 items stored"
+    },
+    "m4_rw_same_cycle/icarus": {
+     "status": "fail",
+     "first_assert": "T4 read+write: full=1 with 1 items stored"
+    },
+    "m4_rw_same_cycle/verilator": {
+     "status": "fail",
+     "first_assert": "T4 read+write: full=1 with 1 items stored"
+    },
+    "m5_comb_rd_data/icarus": {
+     "status": "fail",
+     "first_assert": "T1 reset: rd_data is X/Z (XXXXXXXX)"
+    },
+    "m5_comb_rd_data/verilator": {
+     "status": "fail",
+     "first_assert": "T2 fill: rd_data=0xA1 expected 0x00"
+    },
+    "m6_no_reset_flags/icarus": {
+     "status": "fail",
+     "first_assert": "T1 reset: empty is X/Z (X)"
+    },
+    "m6_no_reset_flags/verilator": {
+     "status": "fail",
+     "first_assert": "T1 reset: empty=0 with 0 items stored"
+    },
+    "m7_write_through_full/icarus": {
+     "status": "fail",
+     "first_assert": "T5 read+write while full: full=1 with 3 items stored"
+    },
+    "m7_write_through_full/verilator": {
+     "status": "fail",
+     "first_assert": "T5 read+write while full: full=1 with 3 items stored"
+    },
+    "m8_rd_data_on_ignored_read/icarus": {
+     "status": "fail",
+     "first_assert": "T3 drain: rd_data=0xA1 expected 0xA4"
+    },
+    "m8_rd_data_on_ignored_read/verilator": {
+     "status": "fail",
+     "first_assert": "T3 drain: rd_data=0xA1 expected 0xA4"
+    }
+   }
+  }
+ }
+}

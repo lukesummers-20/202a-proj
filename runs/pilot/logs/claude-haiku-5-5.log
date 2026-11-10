@@ -1,0 +1,110 @@
+[pilot] spi_slave_rx prose sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] spi_slave_rx table sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      functional_logic   T2: data=0x25 expected 0xA5
+   s4      pass               
+[pilot] spi_slave_rx wave sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] spi_slave_rx combined sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] prio_enc8 prose sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] prio_enc8 table sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] prio_enc8 wave sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] prio_enc8 combined sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] sync_fifo prose sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] sync_fifo table sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] sync_fifo wave sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] sync_fifo combined sv claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+done -> runs/pilot/results.jsonl
+[pilot] spi_slave_rx prose v2001 claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] spi_slave_rx table v2001 claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] prio_enc8 prose v2001 claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] prio_enc8 table v2001 claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] sync_fifo prose v2001 claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+[pilot] sync_fifo table v2001 claude-haiku-5-5 x5
+   s0      pass               
+   s1      pass               
+   s2      pass               
+   s3      pass               
+   s4      pass               
+done -> runs/pilot/results.jsonl

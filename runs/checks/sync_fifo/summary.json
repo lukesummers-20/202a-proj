@@ -1,0 +1,81 @@
+{
+  "problem": "sync_fifo",
+  "sims": [
+    "icarus",
+    "verilator"
+  ],
+  "refs": {
+    "ref.sv/icarus": "pass",
+    "ref.sv/verilator": "pass",
+    "ref.v/icarus": "pass",
+    "ref.v/verilator": "pass"
+  },
+  "mutants": {
+    "m1_full_off_by_one/icarus": {
+      "status": "fail",
+      "first_assert": "T2 fill: full=1 with 3 items stored"
+    },
+    "m1_full_off_by_one/verilator": {
+      "status": "fail",
+      "first_assert": "T2 fill: full=1 with 3 items stored"
+    },
+    "m2_empty_off_by_one/icarus": {
+      "status": "fail",
+      "first_assert": "T3 drain: empty=1 with 1 items stored"
+    },
+    "m2_empty_off_by_one/verilator": {
+      "status": "fail",
+      "first_assert": "T3 drain: empty=1 with 1 items stored"
+    },
+    "m3_write_when_full/icarus": {
+      "status": "fail",
+      "first_assert": "T2 fill: full=0 with 4 items stored"
+    },
+    "m3_write_when_full/verilator": {
+      "status": "fail",
+      "first_assert": "T2 fill: full=0 with 4 items stored"
+    },
+    "m4_rw_same_cycle/icarus": {
+      "status": "fail",
+      "first_assert": "T4 read+write: full=1 with 1 items stored"
+    },
+    "m4_rw_same_cycle/verilator": {
+      "status": "fail",
+      "first_assert": "T4 read+write: full=1 with 1 items stored"
+    },
+    "m5_comb_rd_data/icarus": {
+      "status": "fail",
+      "first_assert": "T1 reset: rd_data is X/Z (XXXXXXXX)"
+    },
+    "m5_comb_rd_data/verilator": {
+      "status": "fail",
+      "first_assert": "T2 fill: rd_data=0xA1 expected 0x00"
+    },
+    "m6_no_reset_flags/icarus": {
+      "status": "fail",
+      "first_assert": "T1 reset: empty is X/Z (X)"
+    },
+    "m6_no_reset_flags/verilator": {
+      "status": "fail",
+      "first_assert": "T1 reset: empty=0 with 0 items stored"
+    },
+    "m7_write_through_full/icarus": {
+      "status": "fail",
+      "first_assert": "T5 read+write while full: full=1 with 3 items stored"
+    },
+    "m7_write_through_full/verilator": {
+      "status": "fail",
+      "first_assert": "T5 read+write while full: full=1 with 3 items stored"
+    },
+    "m8_rd_data_on_ignored_read/icarus": {
+      "status": "fail",
+      "first_assert": "T3 drain: rd_data=0xA1 expected 0xA4"
+    },
+    "m8_rd_data_on_ignored_read/verilator": {
+      "status": "fail",
+      "first_assert": "T3 drain: rd_data=0xA1 expected 0xA4"
+    }
+  },
+  "kill_rate": "16/16",
+  "distinct_first_asserts": 10
+}

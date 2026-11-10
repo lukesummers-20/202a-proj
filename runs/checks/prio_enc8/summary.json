@@ -1,0 +1,49 @@
+{
+  "problem": "prio_enc8",
+  "sims": [
+    "icarus",
+    "verilator"
+  ],
+  "refs": {
+    "ref.sv/icarus": "pass",
+    "ref.sv/verilator": "pass",
+    "ref.v/icarus": "pass",
+    "ref.v/verilator": "pass"
+  },
+  "mutants": {
+    "m1_lowest_priority/icarus": {
+      "status": "fail",
+      "first_assert": "req=0x03: idx=0 expected 1"
+    },
+    "m1_lowest_priority/verilator": {
+      "status": "fail",
+      "first_assert": "req=0x03: idx=0 expected 1"
+    },
+    "m2_idle_idx/icarus": {
+      "status": "fail",
+      "first_assert": "req=0x00: idx=7 expected 0"
+    },
+    "m2_idle_idx/verilator": {
+      "status": "fail",
+      "first_assert": "req=0x00: idx=7 expected 0"
+    },
+    "m3_valid_and/icarus": {
+      "status": "fail",
+      "first_assert": "req=0x01: valid=0 expected 1"
+    },
+    "m3_valid_and/verilator": {
+      "status": "fail",
+      "first_assert": "req=0x01: valid=0 expected 1"
+    },
+    "m4_off_by_one/icarus": {
+      "status": "fail",
+      "first_assert": "req=0x01: idx=1 expected 0"
+    },
+    "m4_off_by_one/verilator": {
+      "status": "fail",
+      "first_assert": "req=0x01: idx=1 expected 0"
+    }
+  },
+  "kill_rate": "8/8",
+  "distinct_first_asserts": 4
+}

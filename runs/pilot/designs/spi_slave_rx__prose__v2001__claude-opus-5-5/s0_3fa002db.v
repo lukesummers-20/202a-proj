@@ -1,0 +1,66 @@
+module spi_slave_rx (
+    input  wire       clk,    // system clock
+    input  wire       rst_n,  // active-low synchronous reset
+    input  wire       sclk,   // SPI clock from master (asynchronous to clk)
+    input  wire       mosi,   // master-out slave-in data
+    input  wire       cs_n,   // active-low chip select
+    output reg  [7:0] data,   // last complete byte received
+    output reg        valid   // one-clk-cycle pulse when data is updated
+);
+
+    // Two-stage synchronizers into the clk domain, plus one extra sclk
+    // stage (sclk_d) so a rising edge can be detected.
+    reg [1:0] sclk_sync;
+    reg [1:0] mosi_sync;
+    reg [1:0] cs_sync;
+    reg       sclk_d;
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            sclk_sync <= 2'b00;
+            mosi_sync <= 2'b00;
+            cs_sync   <= 2'b11;
+            sclk_d    <= 1'b0;
+        end else begin
+            sclk_sync <= {sclk_sync[0], sclk};
+            mosi_sync <= {mosi_sync[0], mosi};
+            cs_sync   <= {cs_sync[0], cs_n};
+            sclk_d    <= sclk_sync[1];
+        end
+    end
+
+    wire sclk_s   = sclk_sync[1];
+    wire mosi_s   = mosi_sync[1];
+    wire cs_s     = cs_sync[1];
+    wire sclk_rise = sclk_s & ~sclk_d;
+
+    // Receive state: bit counter and shift register.
+    reg [2:0] bit_cnt;
+    reg [6:0] shift;
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            bit_cnt <= 3'd0;
+            shift   <= 7'd0;
+            data    <= 8'd0;
+            valid   <= 1'b0;
+        end else begin
+            // Default: valid is a single-cycle pulse.
+            valid <= 1'b0;
+            if (cs_s) begin
+                // Idle: clear the bit count so the next byte starts at bit 7.
+                bit_cnt <= 3'd0;
+            end else if (sclk_rise) begin
+                // Sample MOSI (MSB first).
+                shift   <= {shift[5:0], mosi_s};
+                bit_cnt <= bit_cnt + 3'd1;
+                if (bit_cnt == 3'd7) begin
+                    // Eighth bit: publish the completed byte.
+                    data  <= {shift, mosi_s};
+                    valid <= 1'b1;
+                end
+            end
+        end
+    end
+
+endmodule

@@ -20,7 +20,7 @@ problems/<id>/header.{sv,v} ──────────────┘       
                                                      │
                             run_matrix.py ─► runs/<run>/results.jsonl (one row per generation)
                                                      │
-                                score.py ─► pass@k per cell, bootstrap 95% CI over problems,
+                                score.py ─► pass@k per cell, bootstrap 95% CI over problems + pooled Wilson CI,
                                             failure classes, lint/compliance, greedy (T=0) samples
 ```
 
@@ -57,6 +57,27 @@ python scripts/run_matrix.py --run-id X --problems spi_slave_rx --formats prose 
 python scripts/score.py --run-id X --by format dialect model --csv runs/X/summary.csv
 ```
 
+## Running checkpoint 2 (3-problem pilot)
+
+Problems: `spi_slave_rx` (fsm), `prio_enc8` (combinational, exhaustive testbench), `sync_fifo` (datapath, scoreboard).
+
+```bash
+make audit          # every ref passes, every mutant fails, on both simulators -> runs/audit/audit.md
+make waves          # replay the clocked WaveDrom diagrams against ref.sv (sync_fifo; others are manual)
+make pilot-mock     # the pilot matrix with the mock provider (run id cp2_mock), zero API cost
+make pilot PROVIDER=anthropic MODEL=<pinned-model-id>     # sv x 4 formats + v2001 x prose,table; n=5
+make report RUN=pilot                                     # score tables, heatmap.png, labels.csv worksheet
+python scripts/score.py --run-id pilot --price-in <$/Mtok> --price-out <$/Mtok>   # adds a cost column
+python scripts/labels.py --run-id pilot --summary         # taxonomy table once labels.csv is filled in
+```
+
+`checkpoint2/checkpoint2.md` is the pilot write-up (results, taxonomy, cost, deviations) and
+`checkpoint2/scope_lock.md` the Nov 17 scope-lock page (external problem choices in `checkpoint2/external_problems.md`); their numbers come from the commands above
+(`checkpoint2/evidence_log.txt`). API keys can live in a git-ignored `.env` at the repo root.
+
+Current Claude models do not accept a custom temperature: `--temperature` is ignored for them and rows are
+recorded with `temperature: null` (API-default sampling), and `--greedy-extra` is not meaningful there.
+
 ## Layout
 
 ```
@@ -71,8 +92,10 @@ problems/<id>/
   tb/test_<id>.py          cocotb testbench, identical for every cell
   mutants/m*.sv            plausible wrong designs; every one must FAIL the testbench
 scripts/                   generate · extract · lint · simulate · run_matrix · score · check_problem
+                           audit · check_wave · heatmap · labels
 runs/<run_id>/             generations.jsonl · prompts/ · designs/<cell>/*.sv · results.jsonl · summary.csv
 runs/checks/<id>/summary.json   testbench-strength evidence from check_problem.py
+runs/audit/audit.{md,json}      cross-problem testbench-strength table from audit.py
 ```
 
 Simulator work dirs (`runs/**/sim_*`) are git-ignored; everything needed to re-score is kept.
@@ -84,6 +107,7 @@ Copy `problems/spi_slave_rx/` to `problems/<new_id>/`, replace `problem.yaml`, h
 `ref.sv` (+ `ref.v`), the testbench (rename to `tb/test_<new_id>.py`), write 3–6 mutants
 (wrong edge, off-by-one, sticky flag, wrong reset, bit order, missing enable), then
 `python scripts/check_problem.py <new_id> --sims icarus verilator` until it prints ALL AUTOMATED CHECKS PASS.
+For clocked designs, `python scripts/check_wave.py <new_id>` replays the WaveDrom diagrams against `ref.sv`.
 Also read each spec format alone and confirm the reference follows from it (format sufficiency is manual).
 
 ## Known limitations
@@ -92,3 +116,6 @@ Also read each spec format alone and confirm the reference follows from it (form
 - `classify()` is keyword-based on the first assertion message; hand-label a sample for the report.
 - `dialect_compliant` is regex-based (a Slang-AST version is a later upgrade).
 - `--resume` works per cell, not per sample.
+- For combinational blocks the waveform format is weaker than the table by construction (nine example columns vs. a
+  complete truth table for `prio_enc8`); that asymmetry is part of what the experiment measures.
+- `check_wave.py` only replays diagrams with one column per `clk` cycle that start in reset.

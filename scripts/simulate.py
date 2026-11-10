@@ -56,7 +56,7 @@ def run(problem_id, design, sim="icarus", workdir=None, waves=False):
                      log_file=str(workdir / "build.log"), timescale=("1ns", "1ps"))
     except Exception as e:
         result["status"] = "compile_error"
-        result["first_assert"] = _first_error(workdir / "build.log") or str(e)[:300]
+        result["first_assert"] = _rel(_first_error(workdir / "build.log") or str(e)[:300])
         result["wall_s"] = round(time.time() - t0, 2)
         return result
     try:
@@ -65,12 +65,13 @@ def run(problem_id, design, sim="icarus", workdir=None, waves=False):
                                   extra_env={"COCOTB_LOG_LEVEL": "INFO"}, waves=waves,
                                   timescale=("1ns", "1ps"))
     except Exception as e:
-        result["first_assert"] = str(e)[:300]
+        result["first_assert"] = _rel(str(e)[:300])
         result["wall_s"] = round(time.time() - t0, 2)
         return result
 
     xml = Path(results_xml) if results_xml else workdir / "results.xml"
     result["status"], result["first_assert"] = _parse_results(xml, workdir / "test.log")
+    result["first_assert"] = _rel(result["first_assert"])
     result["wall_s"] = round(time.time() - t0, 2)
     return result
 
@@ -95,6 +96,11 @@ def run_isolated(problem_id, design, sim="icarus", workdir=None, timeout=120, wa
                 "first_assert": (r.stderr.strip().splitlines() or ["no output"])[-1][:300],
                 "wall_s": round(time.time() - t0, 2)}
     return json.loads(lines[-1])
+
+
+def _rel(msg):
+    """Strip the absolute repo path from tool messages so results files are portable."""
+    return msg.replace(str(ROOT) + os.sep, "") if isinstance(msg, str) else msg
 
 
 def _first_error(path):

@@ -1,0 +1,4 @@
+model,pass_at_1,ci_lo,ci_hi,n_problems,passes,samples,wilson_lo,wilson_hi
+claude-haiku-5-5,0.9889,0.9667,1.0,3,89,90,0.9397,0.998
+claude-opus-5-5,1.0,1.0,1.0,3,90,90,0.9591,1.0
+claude-sonnet-5-5,1.0,1.0,1.0,3,90,90,0.9591,1.0

@@ -1,0 +1,96 @@
+# Checkpoint 2 evidence log (2026-11-10)
+
+## A. Testbench audit (make audit)
+problem       class          ref runs pass  mutants killed  distinct first asserts  sims agree  status
+prio_enc8     combinational  4/4            4/4             4                       6/6         OK    
+spi_slave_rx  fsm            4/4            5/5             4                       7/7         OK    
+sync_fifo     datapath       4/4            8/8             10                      10/10       OK    
+
+3/3 problems OK, 17/17 mutants killed on icarus + verilator
+
+## B. Waveform replay against references (make waves)
+  [SKIP] diagram 1: no per-cycle clk row; check by hand
+prio_enc8: 0/1 diagrams replayed against ref.sv, all match
+  [SKIP] diagram 1: no per-cycle clk row; check by hand
+  [SKIP] diagram 2: no per-cycle clk row; check by hand
+  [SKIP] diagram 3: no per-cycle clk row; check by hand
+  [SKIP] diagram 4: does not start in reset (initial state unknown); check by hand
+spi_slave_rx: 0/4 diagrams replayed against ref.sv, all match
+  [OK] diagram 1: 13 columns
+  [OK] diagram 2: 9 columns
+  [OK] diagram 3: 11 columns
+sync_fifo: 3/3 diagrams replayed against ref.sv, all match
+
+## C. Pilot, 3 models x 3 problems, n=5 (scripts/score.py --run-id pilot --by model)
+
+== pass@1 by ['model']  (run pilot, 270 sampled generations, 3 problems) ==
+model                                     pass@k      boot 95% CI  #prob   pooled    Wilson 95% CI
+claude-haiku-5-5                           0.989 [ 0.967, 1.000]      3    89/90 [ 0.940, 0.998]
+claude-opus-5-5                            1.000 [ 1.000, 1.000]      3    90/90 [ 0.959, 1.000]
+claude-sonnet-5-5                          1.000 [ 1.000, 1.000]      3    90/90 [ 0.959, 1.000]
+
+== failure classes ==
+claude-haiku-5-5                         n= 90  pass=89, functional_logic=1
+claude-opus-5-5                          n= 90  pass=90
+claude-sonnet-5-5                        n= 90  pass=90
+
+== simulator disagreements: 14/270 ==
+claude-opus-5-5 / sv / spi_slave_rx / icarus:compile_error / verilator:pass                 13
+claude-sonnet-5-5 / sv / spi_slave_rx / icarus:compile_error / verilator:pass                1
+
+== lint / compliance ==
+claude-haiku-5-5                         slang_ok=90/90  lint_clean=89/90  latch_warn=0/90  dialect_compliant=90/90  out_tokens/gen=1192
+claude-opus-5-5                          slang_ok=90/90  lint_clean=90/90  latch_warn=0/90  dialect_compliant=90/90  out_tokens/gen=804
+claude-sonnet-5-5                        slang_ok=90/90  lint_clean=90/90  latch_warn=0/90  dialect_compliant=90/90  out_tokens/gen=826
+
+== cost / time per problem (all generations) ==
+problem / model                           gens   tok_in  tok_out  api_min  sim_min
+prio_enc8 / claude-haiku-5-5                30    26830     8783      0.8      0.9
+prio_enc8 / claude-opus-5-5                 30    26830     8771      1.9      0.9
+prio_enc8 / claude-sonnet-5-5               30    26830     8362      1.4      0.9
+spi_slave_rx / claude-haiku-5-5             30    50160    54099      3.8      0.9
+spi_slave_rx / claude-opus-5-5              30    50160    41526      6.2      0.9
+spi_slave_rx / claude-sonnet-5-5            30    50160    36315      3.9      0.9
+sync_fifo / claude-haiku-5-5                30    43850    44422      3.1      1.0
+sync_fifo / claude-opus-5-5                 30    43850    22019      3.2      1.0
+sync_fifo / claude-sonnet-5-5               30    43850    29659      3.4      1.0
+TOTAL                                      270   362520   253956     27.7      8.5
+
+## D. By format and by dialect (pooled over models)
+== pass@1 by ['format']  (run pilot, 270 sampled generations, 3 problems) ==
+format                                    pass@k      boot 95% CI  #prob   pooled    Wilson 95% CI
+combined                                   1.000 [ 1.000, 1.000]      3    45/45 [ 0.921, 1.000]
+prose                                      1.000 [ 1.000, 1.000]      3    90/90 [ 0.959, 1.000]
+table                                      0.989 [ 0.967, 1.000]      3    89/90 [ 0.940, 0.998]
+wave                                       1.000 [ 1.000, 1.000]      3    45/45 [ 0.921, 1.000]
+== pass@1 by ['dialect']  (run pilot, 270 sampled generations, 3 problems) ==
+dialect                                   pass@k      boot 95% CI  #prob   pooled    Wilson 95% CI
+sv                                         0.994 [ 0.983, 1.000]      3  179/180 [ 0.969, 0.999]
+v2001                                      1.000 [ 1.000, 1.000]      3    90/90 [ 0.959, 1.000]
+
+## E. By format x dialect x model
+== pass@1 by ['format', 'dialect', 'model']  (run pilot, 270 sampled generations, 3 problems) ==
+format / dialect / model                  pass@k      boot 95% CI  #prob   pooled    Wilson 95% CI
+combined / sv / claude-haiku-5-5           1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+combined / sv / claude-opus-5-5            1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+combined / sv / claude-sonnet-5-5          1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+prose / sv / claude-haiku-5-5              1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+prose / sv / claude-opus-5-5               1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+prose / sv / claude-sonnet-5-5             1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+prose / v2001 / claude-haiku-5-5           1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+prose / v2001 / claude-opus-5-5            1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+prose / v2001 / claude-sonnet-5-5          1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+table / sv / claude-haiku-5-5              0.933 [ 0.800, 1.000]      3    14/15 [ 0.702, 0.988]
+table / sv / claude-opus-5-5               1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+table / sv / claude-sonnet-5-5             1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+table / v2001 / claude-haiku-5-5           1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+table / v2001 / claude-opus-5-5            1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+table / v2001 / claude-sonnet-5-5          1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+wave / sv / claude-haiku-5-5               1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+wave / sv / claude-opus-5-5                1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+wave / sv / claude-sonnet-5-5              1.000 [ 1.000, 1.000]      3    15/15 [ 0.796, 1.000]
+
+## F. Hand labels (scripts/labels.py --run-id pilot --summary)
+manual_class        combined     prose     table      wave   total
+logic                      0         0         1         0       1
+tool                       4         3         4         3      14

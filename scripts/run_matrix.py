@@ -7,7 +7,8 @@
       --dialects sv --provider anthropic --model <MODEL_ID> --n 5 --temperature 0.8 --greedy-extra
 
 --sim both : run Icarus AND Verilator. The primary result is Verilator for sv and Icarus for v2001
-             (proposal 3.4); if the two simulators disagree the row's failure_class is "tool".
+             (proposal 3.4), and it alone decides pass/fail. A row where the two disagree has
+             sim_disagree=true; its failure_class is "tool" only if the primary simulator is the one failing.
 --resume   : skips cells (problem, format, dialect, model) already in results.jsonl.
 """
 import argparse, json, sys
@@ -30,13 +31,13 @@ def classify(row):
         return "no_code"
     if not row["ports_ok"]:
         return "interface"
-    if row.get("sim_disagree"):
-        return "tool"
     st = row["sim_status"]
+    if st == "pass":
+        return "pass"          # primary simulator decides; a disagreement is kept in row["sim_disagree"]
+    if row.get("sim_disagree"):
+        return "tool"          # fails on the primary simulator only
     if st in ("compile_error", "timeout", "tool_error"):
         return {"compile_error": "compile", "timeout": "timeout", "tool_error": "tool"}[st]
-    if st == "pass":
-        return "pass"
     msg = (row.get("first_assert") or "").lower()
     if "reset" in msg or msg.startswith("t1"):
         return "functional_reset"

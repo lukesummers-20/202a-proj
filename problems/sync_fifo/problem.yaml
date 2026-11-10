@@ -1,0 +1,24 @@
+id: sync_fifo
+class: datapath       # combinational | fsm | datapath
+source: own           # own | verilogeval
+title: Synchronous FIFO, 8-bit wide, depth 4, with full/empty flags
+module: sync_fifo
+top_for_sim: sync_fifo
+formats: [prose, table, wave, combined]
+ports:
+  - {name: clk,     dir: input,  width: 1}
+  - {name: rst_n,   dir: input,  width: 1}
+  - {name: wr_en,   dir: input,  width: 1}
+  - {name: wr_data, dir: input,  width: 8}
+  - {name: rd_en,   dir: input,  width: 1}
+  - {name: rd_data, dir: output, width: 8}
+  - {name: full,    dir: output, width: 1}
+  - {name: empty,   dir: output, width: 1}
+requirements:   # hidden from the model; used to write the TB and to check each format is sufficient
+  - "Depth 4, width 8, single clock, active-low synchronous reset."
+  - "A write happens on a clk edge when wr_en=1 and full=0; a read when rd_en=1 and empty=0."
+  - "rd_data is registered: it holds the item removed by the most recent accepted read, updated on that clk edge."
+  - "full/empty reflect the count after the edge; after reset empty=1, full=0, rd_data=0."
+  - "Simultaneous accepted read and write keep the count unchanged."
+  - "A write when full is ignored even if a read is accepted in the same cycle; a read when empty is ignored even if a write is accepted in the same cycle."
+  - "Ignored operations have no side effects."

@@ -1,0 +1,15 @@
+id: prio_enc8
+class: combinational  # combinational | fsm | datapath
+source: own           # own | verilogeval
+title: 8-to-3 priority encoder with valid (interrupt line encoder)
+module: prio_enc8
+top_for_sim: prio_enc8
+formats: [prose, table, wave, combined]
+ports:
+  - {name: req,   dir: input,  width: 8}
+  - {name: idx,   dir: output, width: 3}
+  - {name: valid, dir: output, width: 1}
+requirements:   # hidden from the model; used to write the TB and to check each format is sufficient
+  - "Purely combinational: no clock."
+  - "idx is the index of the highest-numbered asserted bit of req (bit 7 has top priority)."
+  - "valid = 1 when any bit of req is 1; when req = 0, valid = 0 and idx = 0."

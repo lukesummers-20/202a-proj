@@ -1,0 +1,73 @@
+module spi_slave_rx (
+    input  logic       clk,    // system clock
+    input  logic       rst_n,  // active-low synchronous reset
+    input  logic       sclk,   // SPI clock from master (asynchronous to clk)
+    input  logic       mosi,   // master-out slave-in data
+    input  logic       cs_n,   // active-low chip select
+    output logic [7:0] data,   // last complete byte received
+    output logic       valid   // one-clk-cycle pulse when data is updated
+);
+
+    // Synchronizers (2-stage) plus one extra stage for sclk edge detection
+    logic sclk_s1, sclk_s2, sclk_s3;
+    logic mosi_s1, mosi_s2;
+    logic cs_s1,   cs_s2;
+
+    // Shift/bit-count state
+    logic [7:0] shift_reg;
+    logic [2:0] bit_cnt;
+
+    logic sclk_rise;
+    logic cs_active;
+    logic [7:0] next_byte;
+
+    always_comb begin
+        sclk_rise  = sclk_s2 & ~sclk_s3;
+        cs_active  = ~cs_s2;
+        next_byte  = {shift_reg[6:0], mosi_s2};
+    end
+
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            sclk_s1   <= 1'b0;
+            sclk_s2   <= 1'b0;
+            sclk_s3   <= 1'b0;
+            mosi_s1   <= 1'b0;
+            mosi_s2   <= 1'b0;
+            cs_s1     <= 1'b1;
+            cs_s2     <= 1'b1;
+            shift_reg <= 8'h00;
+            bit_cnt   <= 3'd0;
+            data      <= 8'h00;
+            valid     <= 1'b0;
+        end else begin
+            // Synchronize asynchronous SPI inputs into clk domain
+            sclk_s1 <= sclk;
+            sclk_s2 <= sclk_s1;
+            sclk_s3 <= sclk_s2;
+            mosi_s1 <= mosi;
+            mosi_s2 <= mosi_s1;
+            cs_s1   <= cs_n;
+            cs_s2   <= cs_s1;
+
+            // Default: valid is a one-cycle pulse
+            valid <= 1'b0;
+
+            if (!cs_active) begin
+                // Idle: clear bit count
+                bit_cnt <= 3'd0;
+            end else if (sclk_rise) begin
+                // Sample MOSI on SPI clock rising edge (MSB first)
+                shift_reg <= next_byte;
+                if (bit_cnt == 3'd7) begin
+                    data    <= next_byte;
+                    valid   <= 1'b1;
+                    bit_cnt <= 3'd0;
+                end else begin
+                    bit_cnt <= bit_cnt + 3'd1;
+                end
+            end
+        end
+    end
+
+endmodule

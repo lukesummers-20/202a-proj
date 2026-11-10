@@ -4,6 +4,7 @@ Every request/response is appended to runs/<run_id>/generations.jsonl before any
 
 Providers: mock (reference or mutant, no key) | openai (OPENAI_API_KEY; OPENAI_BASE_URL for
 vLLM/Ollama-compatible endpoints) | anthropic (ANTHROPIC_API_KEY)
+Keys may also be put in a git-ignored .env file at the repo root (KEY=value lines).
 
   python scripts/generate.py --problem spi_slave_rx --format table --dialect sv --print-prompt
 """
@@ -63,20 +64,46 @@ def call_openai(system, user, model, temperature, seed, max_tokens):
             "stop_reason": r.choices[0].finish_reason}
 
 
+def load_dotenv(path=ROOT / ".env"):
+    """Minimal .env reader (KEY=value lines); real environment variables win."""
+    if not path.exists():
+        return
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip().removeprefix("export ").strip(), v.strip().strip("'\""))
+
+
 def call_anthropic(system, user, model, temperature, seed, max_tokens):
+    """Plain single-turn request. No refusal fallback is configured on purpose: a fallback would
+    silently answer with a different model and contaminate the cell; a refusal is scored as no code.
+
+    Current Claude models reject non-default sampling parameters (HTTP 400) and the current SDK no
+    longer has the argument. When that happens the
+    request is re-sent without `temperature` and the record gets temperature=None ("API default"),
+    so the n samples of a cell are independent draws at the provider's default sampling."""
     import anthropic
     client = anthropic.Anthropic()
-    r = client.messages.create(model=model, max_tokens=max_tokens, temperature=temperature,
-                               system=system, messages=[{"role": "user", "content": user}])
+    kw = dict(model=model, max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": user}])
+    used = temperature
+    try:
+        r = client.messages.create(temperature=temperature, **kw)
+    except (anthropic.BadRequestError, TypeError) as e:   # TypeError: SDK >= 2 has no such argument
+        if "temperature" not in str(e).lower():
+            raise
+        used = None
+        r = client.messages.create(**kw)
     return {"text": "".join(b.text for b in r.content if b.type == "text"),
             "usage": {"input_tokens": r.usage.input_tokens, "output_tokens": r.usage.output_tokens},
-            "model_version": r.model, "stop_reason": r.stop_reason}
+            "model_version": r.model, "stop_reason": r.stop_reason, "temperature_used": used}
 
 
 def generate(problem, fmt, dialect, provider, model, n, temperature, max_tokens, run_id, seed0=0,
              greedy_extra=False):
     """n samples at `temperature`; if greedy_extra, one more sample at T=0 (flagged greedy=True,
     excluded from pass@k by score.py, used for determinism checks)."""
+    load_dotenv()
     system, user = build_prompt(problem, fmt, dialect)
     out_dir = ROOT / "runs" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -103,7 +130,7 @@ def generate(problem, fmt, dialect, provider, model, n, temperature, max_tokens,
         rec = {"gen_id": str(uuid.uuid4())[:8], "run_id": run_id, "problem": problem, "format": fmt,
                "dialect": dialect, "provider": provider, "model": model,
                "model_version": resp.get("model_version"), "sample": i, "seed": seed, "greedy": greedy,
-               "temperature": temp, "max_tokens": max_tokens, "prompt_hash": prompt_hash,
+               "temperature": resp.get("temperature_used", temp), "max_tokens": max_tokens, "prompt_hash": prompt_hash,
                "usage": resp["usage"], "stop_reason": resp.get("stop_reason"),
                "latency_s": round(time.time() - t0, 2),
                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
